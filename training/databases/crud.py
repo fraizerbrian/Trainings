@@ -1,6 +1,6 @@
 from basic import db, Puppy
 
-# CREATE
+# CREATE ALL THE TABLES Model-->Db table
 my_puppy = Puppy('Rufus',5)
 db.session.add(my_puppy)
 db.session.commit()

@@ -1,10 +1,10 @@
 import os
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate #pip install Flask-Migrate
 
 #  __file__ --> basic.py and grabs directoryname and pathname ieC://Users/Fraize/Desktop/training/databases/basic.py
 basedir =  os.path.abspath(os.path.dirname(__file__))
-# print(basedir)
 
 app = Flask(__name__)
 
@@ -13,6 +13,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 
+migrate=Migrate(app,db)
 ##################################################
 class Puppy(db.Model):
     # manual tablename choice
@@ -22,10 +23,12 @@ class Puppy(db.Model):
     id = db.Column(db.Integer,primary_key=True)
     name = db.Column(db.Text)
     age = db.Column(db.Integer)
+    breed = db.Column(db.Text)
 
-    def __init__(self,name,age):
+    def __init__(self,name,age,breed):
         self.name = name
         self.age = age
+        self.breed = breed
 
     def __repr__(self):
         return f"Puppy {self.name} is {self.age} years old"
